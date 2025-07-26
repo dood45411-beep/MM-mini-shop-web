@@ -206,22 +206,102 @@
 </body>
 </html->
 
-<h3>Seller Uploaded Products</h3>
-<button onclick="goToSellerProducts()" style="background:#2980b9;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;margin-bottom:10px;">
-  ရောင်းသူတင်ထားသောပစ္စည်းများ ကြည့်ရန်
-</button>
+<!DOCTYPE html><html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - MM Mini Shop</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+    h1 {
+      color: #333;
+    }
+    .section {
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>  <div class="section">
+    <h3>တစ်သက်စာ သက်တမ်း Unlock လုပ်ရန်</h3>
+    <input type="text" id="sellerPhone" placeholder="Seller ဖုန်းနံပါတ်ထည့်ပါ">
+    <br>
+    <button onclick="unlockLifetime()">Unlock Lifetime</button>
+  </div>  <div class="section">
+    <h3>Admin Code ထုတ်ရန် (Seller ဝင်ခွင့်)</h3>
+    <button onclick="generateCode()">Code အသစ် ထုတ်မယ်</button>
+    <div id="codeList" style="margin-top: 10px;"></div>
+  </div>  <div class="section">
+    <h3>ရောင်းသူတင်ထားသောပစ္စည်းများ</h3>
+    <div id="productsList">
+      <!-- Seller products will appear here -->
+    </div>
+  </div>  <script>
+    const paidUsers = JSON.parse(localStorage.getItem("paid_users") || "[]");
+    const codeStorageKey = "admin_codes";
 
-<table id="productTable">
-  <thead>
-    <tr>
-      <th>Seller ဖုန်းနံပါတ်</th>
-      <th>ပစ္စည်းအမည်</th>
-      <th>ဖော်ပြချက်</th>
-      <th>ဓာတ်ပုံ</th>
-      <th>ဈေးနှုန်း (MMK)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- product data -->
-  </tbody>
-</table>
+    function unlockLifetime() {
+      const phone = document.getElementById("sellerPhone").value.trim();
+      if (!phone) {
+        alert("ဖုန်းနံပါတ်ထည့်ပါ");
+        return;
+      }
+
+      if (!paidUsers.includes(phone)) {
+        paidUsers.push(phone);
+        localStorage.setItem("paid_users", JSON.stringify(paidUsers));
+        alert("တစ်သက်စာ access unlock လုပ်ပြီးပါပြီ။");
+      } else {
+        alert("ဒီဖုန်းနံပါတ်ဟာ ယခင်ကတင်ပြီးသားဖြစ်ပါသည်။");
+      }
+    }
+
+    function generateCode() {
+      const codes = JSON.parse(localStorage.getItem(codeStorageKey) || "[]");
+      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+      codes.push(newCode);
+      localStorage.setItem(codeStorageKey, JSON.stringify(codes));
+      displayCodes();
+    }
+
+    function displayCodes() {
+      const codes = JSON.parse(localStorage.getItem(codeStorageKey) || "[]");
+      const container = document.getElementById("codeList");
+      container.innerHTML = "<strong>သုံးရန် Codes:</strong><br>" + codes.map(c => `<div>${c}</div>`).join("");
+    }
+
+    // Initial load
+    displayCodes();
+
+    // Display seller products
+    const sellerProducts = JSON.parse(localStorage.getItem("seller_products") || "[]");
+    const productContainer = document.getElementById("productsList");
+    sellerProducts.forEach(product => {
+      const div = document.createElement("div");
+      div.textContent = `${product.name} - ${product.price} Ks`;
+      productContainer.appendChild(div);
+    });
+  </script></body>
+</html>
