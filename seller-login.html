@@ -1,65 +1,85 @@
-<!DOCTYPE html>
-<html lang="my">
+<!DOCTYPE html><html lang="my">
 <head>
   <meta charset="UTF-8">
   <title>Seller Login - MM Mini Shop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Myanmar3', sans-serif;
-      background-color: #fefefe;
+      font-family: sans-serif;
+      background-color: #f2f2f2;
       padding: 30px;
-      text-align: center;
+    }
+    .login-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h2 {
+      text-align: center;
       color: #333;
     }
     input {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
+      width: 100%;
       padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
+      margin: 10px 0;
       border: 1px solid #ccc;
+      border-radius: 5px;
     }
     button {
-      padding: 12px 30px;
-      background-color: #16a085;
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
       color: white;
-      border: none;
-      border-radius: 8px;
       font-size: 16px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
-      margin-top: 10px;
     }
     button:hover {
-      background-color: #12876f;
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h2>🛒 ရောင်းသူအကောင့်ဝင်ရန်</h2>
-  <input type="text" id="sellerPhone" placeholder="ဖုန်းနံပါတ်">
-  <input type="password" id="sellerPassword" placeholder="စကားဝှက်">
-  <button onclick="loginSeller()">Login ဝင်မယ်</button>
+  <div class="login-box">
+    <h2>ရောင်းသူဝင်ရန်</h2>
+    <input type="text" id="phone" placeholder="ဖုန်းနံပါတ်">
+    <input type="text" id="refCode" placeholder="Admin Reference Code">
+    <button onclick="verifySeller()">ဝင်မယ်</button>
+  </div>  <script>
+    function verifySeller() {
+      const phone = document.getElementById("phone").value.trim();
+      const code = document.getElementById("refCode").value.trim();
+      const paidUsers = JSON.parse(localStorage.getItem("paid_users") || "[]");
+      const validCodes = JSON.parse(localStorage.getItem("admin_codes") || "[]");
 
-  <script>
-    function loginSeller() {
-      const phone = document.getElementById("sellerPhone").value;
-      const password = document.getElementById("sellerPassword").value;
+      if (!phone) {
+        alert("ဖုန်းနံပါတ်ထည့်ပါ");
+        return;
+      }
 
-      const sellers = JSON.parse(localStorage.getItem("seller_accounts") || "{}");
-      const user = sellers[phone];
+      // Already unlocked
+      if (paidUsers.includes(phone)) {
+        localStorage.setItem("current_seller_phone", phone);
+        window.location.href = "seller-dashboard.html";
+        return;
+      }
 
-      if (user && user.password === password) {
-        localStorage.setItem("currentSeller", phone);
-        window.location.href = "seller-profile.html";
+      if (validCodes.includes(code)) {
+        paidUsers.push(phone);
+        localStorage.setItem("paid_users", JSON.stringify(paidUsers));
+        localStorage.setItem("current_seller_phone", phone);
+        // remove used code
+        const newCodes = validCodes.filter(c => c !== code);
+        localStorage.setItem("admin_codes", JSON.stringify(newCodes));
+        alert("Lifetime access unlocked!");
+        window.location.href = "seller-dashboard.html";
       } else {
-        alert("ဖုန်းနံပါတ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။");
+        alert("Code မှားနေပါတယ် သေချာစစ်ပါ။");
       }
     }
-  </script>
-</body>
+  </script></body>
 </html>
