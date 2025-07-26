@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>Seller Access - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #fdfdfd;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #2d3436;
+    }
+    input {
+      width: 90%;
+      max-width: 300px;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 12px 25px;
+      background-color: #8e44ad;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #71368a;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔐 ရောင်းသူ ဝင်ခွင့်တောင်းရန်</h2>
+  <input type="text" id="accessCode" placeholder="Admin Code ထည့်ပါ">
+  <button onclick="checkCode()">ဝင်မယ်</button>
+
+  <script>
+    function checkCode() {
+      const code = document.getElementById("accessCode").value.trim();
+      const validCodeList = JSON.parse(localStorage.getItem("admin_codes") || "[]");
+
+      if (validCodeList.includes(code)) {
+        alert("Code မှန်ပါတယ်။ Seller Login သို့ပို့မည်။");
+        window.location.href = "seller-login.html";
+      } else {
+        alert("Code မှားနေပါတယ်။ Admin ထံစစ်ပါ။");
+      }
+    }
+  </script>
+</body>
+</html>

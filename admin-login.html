@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: 'Myanmar3', sans-serif; padding: 20px; background: #fff8e1; }
+    input, button {
+      width: 100%;
+      max-width: 320px;
+      margin: 10px auto;
+      padding: 10px;
+      display: block;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #922b21;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Admin Login</h2>
+  <input type="text" id="adminPhone" placeholder="ဖုန်းနံပါတ်" />
+  <input type="password" id="adminPassword" placeholder="Password" />
+  <button onclick="adminLogin()">Login</button>
+
+  <script>
+    const adminPhoneCorrect = '09686246899';
+    const adminPasswordCorrect = 'fyno2007';
+
+    function adminLogin() {
+      const phone = document.getElementById('adminPhone').value.trim();
+      const password = document.getElementById('adminPassword').value;
+
+      if (!phone || !password) {
+        alert('ဖုန်းနံပါတ်နဲ့ Password ဖြည့်ပါ။');
+        return;
+      }
+
+      if (phone === adminPhoneCorrect && password === adminPasswordCorrect) {
+        localStorage.setItem('currentAdmin', phone);
+        alert('Admin Login အောင်မြင်ပါသည်။');
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        alert('ဖုန်းနံပါတ် သို့မဟုတ် Password မှားနေပါသည်။');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seller Payment - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #fff8e1;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #d35400;
+    }
+    input[type="file"] {
+      margin: 20px auto;
+      display: block;
+    }
+    img {
+      margin: 15px auto;
+      max-width: 250px;
+      border-radius: 10px;
+      display: block;
+    }
+    button {
+      background-color: #d35400;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #a64000;
+    }
+  </style>
+</head>
+<body>
+  <h2>💰 Seller Payment - MM Mini Shop</h2>
+  <p>MMK 15,000 တစ်သက်စာ ငွေပေးချေမှုကို ပေးပြီး ရရှိသော Screenshot ကို အောက်မှာတင်ပါ။</p>
+  <input type="file" id="paymentScreenshot" accept="image/*" onchange="previewScreenshot()" />
+  <img id="screenshotPreview" src="" alt="Payment Screenshot Preview" />
+  <button onclick="submitPayment()">ပေးပို့မယ်</button>
+
+  <script>
+    function previewScreenshot() {
+      const file = document.getElementById('paymentScreenshot').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('screenshotPreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitPayment() {
+      const phone = localStorage.getItem('currentSeller');
+      if (!phone) {
+        alert('Seller ဖုန်းနံပါတ်မတွေ့ပါ။ Login ပြန်လုပ်ပါ။');
+        window.location.href = 'seller-login.html';
+        return;
+      }
+
+      const screenshot = document.getElementById('screenshotPreview').src;
+      if (!screenshot) {
+        alert('Screenshot တင်ရန် လိုအပ်သည်။');
+        return;
+      }
+
+      let payments = JSON.parse(localStorage.getItem('seller_payments') || '{}');
+      payments[phone] = {
+        screenshot,
+        timestamp: new Date().toISOString(),
+        verified: false
+      };
+      localStorage.setItem('seller_payments', JSON.stringify(payments));
+      alert('Payment Screenshot အတည်ပြုရန် Admin ဆီသို့ ပေးပို့ပြီးပါပြီ။');
+      window.location.href = 'seller-dashboard.html';
+    }
+  </script>
+</body>
+</html>

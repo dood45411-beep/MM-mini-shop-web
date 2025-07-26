@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #fffde7;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #c0392b;
+    }
+    .nav-buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav-buttons button {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+    .nav-buttons button:hover {
+      background-color: #1c5980;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+    th, td {
+      border: 1px solid #d5d5d5;
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #f9e79f;
+    }
+    tr.verified {
+      background-color: #d4efdf;
+    }
+    button.action-btn {
+      background-color: #c0392b;
+      padding: 8px 15px;
+      border-radius: 8px;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    button.action-btn:hover {
+      background-color: #922b21;
+    }
+    img {
+      max-width: 120px;
+      max-height: 100px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛠 Admin Dashboard</h2>
+  <div class="nav-buttons">
+    <button onclick="goHome()">Go to Home</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <h3>Seller Payment Verification (တစ်သက်စာ)</h3>
+  <table id="paymentTable">
+    <thead>
+      <tr>
+        <th>ဖုန်းနံပါတ်</th>
+        <th>Payment Screenshot</th>
+        <th>ပေးချေသည့်ရက်စွဲ</th>
+        <th>အတည်ပြုခြင်း</th>
+        <th>တစ်သက်စာ သက်တမ်း</th>
+        <th>လုပ်ဆောင်ချက်</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- payment data -->
+    </tbody>
+  </table>
+
+  <h3>Seller Uploaded Products</h3>
+  <table id="productTable">
+    <thead>
+      <tr>
+        <th>Seller ဖုန်းနံပါတ်</th>
+        <th>ပစ္စည်းအမည်</th>
+        <th>ဖော်ပြချက်</th>
+        <th>ဓာတ်ပုံ</th>
+        <th>ဈေးနှုန်း (MMK)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- product data -->
+    </tbody>
+  </table>
+
+  <script>
+    // Navigation
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+    function logout() {
+      localStorage.removeItem('currentAdmin');
+      alert('Admin Logout လုပ်ပြီးပါပြီ။');
+      window.location.href = 'admin-login.html';
+    }
+
+    // Date format helper
+    function formatDate(timestamp) {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp);
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const day = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${day}`;
+    }
+
+    // Load seller payments
+    function loadPayments() {
+      const payments = JSON.parse(localStorage.getItem('seller_payments') || '{}');
+      const tbody = document.querySelector('#paymentTable tbody');
+      tbody.innerHTML = '';
+
+      const now = Date.now();
+
+      for (const phone in payments) {
+        const payment = payments[phone];
+        const expired = payment.expiry && payment.expiry < now;
+        const verified = payment.verified && !expired;
+
+        const expiryText = expired ? '⛔ သက်တမ်းကုန်ပြီ' : verified ? '✅ အတည်ပြုပြီး (တစ်သက်စာ)' : '❌ မအတည်ပြုရသေး';
+
+        const tr = document.createElement('tr');
+        if (verified) {
+          tr.classList.add('verified');
+        }
+
+        tr.innerHTML = `
+          <td>${phone}</td>
+          <td>${payment.screenshot ? `<img src="${payment.screenshot}" alt="Payment Screenshot" />` : '-'}</td>
+          <td>${formatDate(payment.timestamp)}</td>
+          <td>${verified ? '✅ Verified' : '❌ Not Verified'}</td>
+          <td>${expiryText}</td>
+          <td>
+            ${verified ? '' : `<button class="action-btn" onclick="verifyPayment('${phone}')">Verify & Lifetime</button>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Verify payment function
+    function verifyPayment(phone) {
+      if (confirm(phone + ' ကို တစ်သက်စာအတွက် အတည်ပြုချင်ပါသလား?')) {
+        const payments = JSON.parse(localStorage.getItem('seller_payments') || '{}');
+        if (payments[phone]) {
+          payments[phone].verified = true;
+          payments[phone].expiry = 32503680000000; // 3000-01-01 (lifetime)
+          localStorage.setItem('seller_payments', JSON.stringify(payments));
+          alert('တစ်သက်စာအတည်ပြုပြီးပါပြီ။');
+          loadPayments();
+        }
+      }
+    }
+
+    // Load seller products
+    function loadProducts() {
+      const products = JSON.parse(localStorage.getItem('seller_products') || '[]');
+      const tbody = document.querySelector('#productTable tbody');
+      tbody.innerHTML = '';
+
+      for (const product of products) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${product.sellerPhone}</td>
+          <td>${product.name}</td>
+          <td>${product.description}</td>
+          <td>${product.image ? `<img src="${product.image}" alt="Product Image" />` : '-'}</td>
+          <td>${product.price}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Check Admin login
+    if (!localStorage.getItem('currentAdmin')) {
+      alert('Admin မဝင်ရောက်ထားပါ။ Login ပြန်လုပ်ပါ။');
+      window.location.href = 'admin-login.html';
+    } else {
+      loadPayments();
+      loadProducts();
+    }
+  </script>
+</body>
+</html->
+
+<h3>Seller Uploaded Products</h3>
+<button onclick="goToSellerProducts()" style="background:#2980b9;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;margin-bottom:10px;">
+  ရောင်းသူတင်ထားသောပစ္စည်းများ ကြည့်ရန်
+</button>
+
+<table id="productTable">
+  <thead>
+    <tr>
+      <th>Seller ဖုန်းနံပါတ်</th>
+      <th>ပစ္စည်းအမည်</th>
+      <th>ဖော်ပြချက်</th>
+      <th>ဓာတ်ပုံ</th>
+      <th>ဈေးနှုန်း (MMK)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- product data -->
+  </tbody>
+</table>

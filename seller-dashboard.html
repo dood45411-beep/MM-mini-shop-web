@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seller Dashboard - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #e8f6f3;
+      padding: 20px;
+    }
+    h2, h3 {
+      text-align: center;
+      color: #27ae60;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto 30px auto;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #1e8449;
+    }
+    .product-list {
+      max-width: 600px;
+      margin: 0 auto 40px auto;
+    }
+    .product-item {
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      padding: 15px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .product-item img {
+      max-width: 100px;
+      max-height: 100px;
+      border-radius: 8px;
+      float: right;
+      margin-left: 15px;
+      object-fit: cover;
+    }
+    .other-seller-product {
+      background-color: #fff9c4;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛒 Seller Dashboard</h2>
+  <form id="productForm">
+    <input type="text" id="productTitle" placeholder="ပစ္စည်းအမည်" required />
+    <input type="number" id="productPrice" placeholder="ဈေးနှုန်း (ကျပ်)" required />
+    <input type="file" id="productPhoto" accept="image/*" required />
+    <textarea id="productDescription" placeholder="ဖော်ပြချက် (အပိုအချက်အလက်)" rows="3"></textarea>
+    <button type="submit">ပစ္စည်းအသစ်ထည့်မယ်</button>
+  </form>
+
+  <div class="product-list" id="productList">
+    <!-- ကိုယ်ပိုင် ပစ္စည်းတွေ -->
+  </div>
+
+  <div id="otherSellerProductsContainer">
+    <!-- အခြားရောင်းသူများပစ္စည်းများ ဒီမှာ -->
+  </div>
+
+  <script>
+    const sellerPhone = localStorage.getItem('currentSeller');
+    if (!sellerPhone) {
+      alert('Seller မသိရှိပါ။ Login ပြန်လုပ်ပါ။');
+      window.location.href = 'seller-login.html';
+    }
+
+    const productStorageKey = 'products_' + sellerPhone;
+
+    const productForm = document.getElementById('productForm');
+    const productList = document.getElementById('productList');
+    const otherSellerProductsContainer = document.getElementById('otherSellerProductsContainer');
+
+    productForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('productTitle').value.trim();
+      const price = document.getElementById('productPrice').value.trim();
+      const description = document.getElementById('productDescription').value.trim();
+      const photoFile = document.getElementById('productPhoto').files[0];
+
+      if (!title || !price || !photoFile) {
+        alert('အမည်၊ ဈေးနှုန်းနှင့် ပုံတစ်ပုံ လိုအပ်ပါတယ်။');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const photoData = e.target.result;
+
+        let products = JSON.parse(localStorage.getItem(productStorageKey) || '[]');
+        products.push({
+          title: title,
+          price: price,
+          description: description,
+          photo: photoData,
+          timestamp: new Date().toISOString()
+        });
+
+        localStorage.setItem(productStorageKey, JSON.stringify(products));
+        alert('ပစ္စည်းအသစ်ထည့်ပြီးပါပြီ။');
+        productForm.reset();
+        loadProducts();
+      };
+      reader.readAsDataURL(photoFile);
+    });
+
+    function loadProducts() {
+      let products = JSON.parse(localStorage.getItem(productStorageKey) || '[]');
+      productList.innerHTML = '<h3>ကိုယ်ပိုင် ပစ္စည်းများ</h3>';
+
+      if (products.length === 0) {
+        productList.innerHTML += '<p style="text-align:center;">ပစ္စည်းမရှိသေးပါ။</p>';
+        return;
+      }
+
+      products.forEach((p) => {
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.innerHTML = `
+          <strong>${p.title}</strong><br>
+          💰 ${p.price} ကျပ်<br>
+          <img src="${p.photo}" alt="${p.title}" />
+          <p>${p.description}</p>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    function loadOtherSellersProducts() {
+      const allKeys = Object.keys(localStorage);
+      otherSellerProductsContainer.innerHTML = '<h3>အခြား ရောင်းသူများ တင်ထားသော ပစ္စည်းများ</h3>';
+
+      let foundAny = false;
+
+      allKeys.forEach(key => {
+        if (key.startsWith('products_') && key !== productStorageKey) {
+          const products = JSON.parse(localStorage.getItem(key) || '[]');
+          if (products.length > 0) {
+            foundAny = true;
+            products.forEach(p => {
+              const div = document.createElement('div');
+              div.className = 'product-item other-seller-product';
+              div.innerHTML = `
+                <strong>${p.title}</strong><br>
+                💰 ${p.price} ကျပ်<br>
+                <img src="${p.photo}" alt="${p.title}" />
+                <p>${p.description}</p>
+              `;
+              otherSellerProductsContainer.appendChild(div);
+            });
+          }
+        }
+      });
+
+      if (!foundAny) {
+        otherSellerProductsContainer.innerHTML += '<p style="text-align:center;">အခြားရောင်းသူများမှ ပစ္စည်းမရှိသေးပါ။</p>';
+      }
+    }
+
+    window.onload = function() {
+      loadProducts();
+      loadOtherSellersProducts();
+    };
+  </script>
+</body>
+</html>

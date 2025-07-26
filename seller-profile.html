@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seller Profile - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #fafafa;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #34495e;
+    }
+    input, textarea {
+      width: 90%;
+      max-width: 350px;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      display: block;
+    }
+    img {
+      margin: 10px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #2980b9;
+      display: block;
+    }
+    button {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      margin-top: 15px;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛒 ရောင်းသူ ကိုယ်ရေးအချက်အလက်</h2>
+  <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto()" />
+  <img id="preview" src="" alt="Seller Photo" />
+  <input type="text" id="sellerName" placeholder="နာမည်" />
+  <input type="text" id="sellerViber" placeholder="Viber ဖုန်းနံပါတ်" />
+  <input type="text" id="sellerPhone" placeholder="ဖုန်းနံပါတ်" disabled />
+  <input type="text" id="sellerAddress" placeholder="လိပ်စာ" />
+  <textarea id="sellerNote" placeholder="အပိုအချက်အလက်"></textarea>
+  <button onclick="saveSellerProfile()">သိမ်းမယ်</button>
+
+  <script>
+    // ဖုန်းနံပါတ်ကို Login မှာ ထည့်ထားတဲ့ data ကနေ Load
+    document.getElementById('sellerPhone').value = localStorage.getItem('currentSeller') || '';
+
+    function previewPhoto() {
+      const file = document.getElementById('photoInput').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveSellerProfile() {
+      const phone = document.getElementById('sellerPhone').value;
+      const name = document.getElementById('sellerName').value;
+      const viber = document.getElementById('sellerViber').value;
+      const address = document.getElementById('sellerAddress').value;
+      const note = document.getElementById('sellerNote').value;
+      const photo = document.getElementById('preview').src;
+
+      if (!name || !viber || !address) {
+        alert('နာမည်၊ Viber နံပါတ် နှင့် လိပ်စာကို ဖြည့်ပါ');
+        return;
+      }
+
+      const profile = { name, viber, address, note, photo };
+      let sellers = JSON.parse(localStorage.getItem('seller_profiles') || '{}');
+      sellers[phone] = profile;
+      localStorage.setItem('seller_profiles', JSON.stringify(sellers));
+
+      alert('ကိုယ်ရေးအချက်အလက် သိမ်းပြီးပါပြီ။');
+      window.location.href = 'seller-payment.html';
+    }
+  </script>
+</body>
+</html>

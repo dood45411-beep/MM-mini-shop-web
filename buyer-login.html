@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>Buyer Login - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #ecf0f1;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    input {
+      width: 90%;
+      max-width: 300px;
+      padding: 12px;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: block;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 30px;
+      font-size: 16px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e8449;
+    }
+  </style>
+</head>
+<body>
+  <h2>📱 ဝယ်သူအကောင့်ဝင်ရန်</h2>
+  <input type="text" id="buyerPhone" placeholder="ဖုန်းနံပါတ်ထည့်ပါ">
+  <button onclick="loginBuyer()">ဝင်မယ်</button>
+
+  <script>
+    function loginBuyer() {
+      const phone = document.getElementById("buyerPhone").value;
+      if (phone.length < 7) {
+        alert("ဖုန်းနံပါတ်မှန်မှန်ရိုက်ထည့်ပါ");
+        return;
+      }
+      localStorage.setItem("buyerPhone", phone);
+      window.location.href = "buyer-profile.html";
+    }
+  </script>
+</body>
+</html>

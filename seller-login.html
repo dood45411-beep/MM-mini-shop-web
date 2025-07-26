@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>Seller Login - MM Mini Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Myanmar3', sans-serif;
+      background-color: #fefefe;
+      padding: 30px;
+      text-align: center;
+    }
+    h2 {
+      color: #333;
+    }
+    input {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 12px 30px;
+      background-color: #16a085;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #12876f;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛒 ရောင်းသူအကောင့်ဝင်ရန်</h2>
+  <input type="text" id="sellerPhone" placeholder="ဖုန်းနံပါတ်">
+  <input type="password" id="sellerPassword" placeholder="စကားဝှက်">
+  <button onclick="loginSeller()">Login ဝင်မယ်</button>
+
+  <script>
+    function loginSeller() {
+      const phone = document.getElementById("sellerPhone").value;
+      const password = document.getElementById("sellerPassword").value;
+
+      const sellers = JSON.parse(localStorage.getItem("seller_accounts") || "{}");
+      const user = sellers[phone];
+
+      if (user && user.password === password) {
+        localStorage.setItem("currentSeller", phone);
+        window.location.href = "seller-profile.html";
+      } else {
+        alert("ဖုန်းနံပါတ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။");
+      }
+    }
+  </script>
+</body>
+</html>
